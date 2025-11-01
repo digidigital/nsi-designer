@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>NSI Designer – Documentation & Quickstart</title>
-  <meta name="description">NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)</meta>
+  <meta name="description" content=""NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -19,13 +19,14 @@
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      background: #111;
+      background: rgba(17, 17, 17, 0.65); /* translucent black */
       color: #fff;
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(5px); /* optional: adds a frosted glass effect */
     }
     header nav a {
       color: #fff;
@@ -39,7 +40,9 @@
       max-width: 1000px;
       margin: auto;
     }
-    section { margin-bottom: 4rem; }
+    section { 
+      scroll-margin-top: 5rem;
+      margin-bottom: 4rem; }
     h1, h2, h3 {
       font-weight: 600;
       margin-bottom: 0.5rem;
@@ -83,8 +86,8 @@
   </nav>
 </header>
 
-<main>
-  <section id="intro">
+<main id="intro">
+  <section >
     <h1>NSI Designer</h1>
     <p><strong>NSI Designer</strong> is a free PySide6 desktop application for creating 
     Windows installers with the <em>Nullsoft Scriptable Install System (NSIS)</em>. 
@@ -235,7 +238,7 @@
     <ul>
       <li><code>/S</code> – Silent installation</li>
       <li><code>/NOICONS</code> – Do not create shortcuts</li>
-      <li><code>/LOG[=path]</code> – Enable logging, optionally specify log file path</li>
+      <li><code>/LOG[=path]</code> – Enable logging, optionally specify log file path (Include the filename!)</li>
       <li><code>/D=path</code> – Set installation directory</li>
     </ul>
     <p><strong>Important:</strong> The <code>/D=path</code> parameter must always be the 
