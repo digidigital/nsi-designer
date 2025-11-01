@@ -27,6 +27,10 @@ With NSI Designer you can:
 
 Whether you call it an **installer maker, setup creator, or installer generator**, NSI Designer gives you a modern, PySide6‑based desktop app to streamline the process.
 
+## Download Windows Installer
+
+Get the latest Installer: https://github.com/digidigital/nsi-designer/releases
+
 ## Install via pypi
 
 Install via pypi and run from command line:
