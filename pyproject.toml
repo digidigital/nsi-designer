@@ -1,0 +1,42 @@
+[project]
+name = "nsi-designer"
+version = "0.1.0"
+description = "A PySide6 desktop application to design and export NSIS installer scripts (.nsi) with live preview."
+authors = [{ name = "Björn Seipel", email = "support@digidigital.de" }]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["nsis", "nsi", "installer", "pyinstaller", "packaging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Build Tools",
+]
+dependencies = [
+    "PySide6>=6.5",
+    "Pillow>=10.0"
+]
+
+[project.scripts]
+nsi_designer = "nsi_designer.app:main"
+
+[project.urls]
+Homepage = "https://github.com/digidigital/nsi-designer"
+Repository = "https://github.com/digidigital/nsi-designer.git"
+Issues = "https://github.com/digidigital/nsi-designer/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nsi_designer*"]
+
+[tool.setuptools.package-data]
+"nsi_designer" = ["images/*"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
