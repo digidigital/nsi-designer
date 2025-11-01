@@ -41,6 +41,11 @@ or
 
 `python -m nsi_designer`
 
+
+## Documentation
+
+Visit https://nsi-designer.digidigital.de for a brief introduction and description of the application.
+
 ## Notes
 - Asset conversions happen on export using Pillow.
 - Makensis path is stored in QSettings after first selection if not found.
