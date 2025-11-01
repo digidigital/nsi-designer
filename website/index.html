@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NSI Designer – Documentation & Quickstart</title>
+  <meta name="description">NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)</meta>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+      background: #fff;
+      color: #222;
+    }
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #111;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    header nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+    }
+    header nav a:hover { text-decoration: underline; }
+    main {
+      padding: 6rem 2rem 3rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    section { margin-bottom: 4rem; }
+    h1, h2, h3 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    h1 { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: .3rem; }
+    h2 { font-size: 1.4rem; margin-top: 2rem; }
+    h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+    ul { list-style: square; padding-left: 1.2rem; }
+    code {
+      background: #f4f4f4;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.95em;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: #666;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div><strong>NSI Designer</strong></div>
+  <nav>
+    <a href="#intro">Introduction</a>
+    <a href="#install">Installation</a>
+    <a href="#features">Features</a>
+    <a href="#gui">GUI</a>
+    <a href="#fields">Input Fields</a>
+    <a href="#power">Power Users</a>
+    <a href="#notes">Notes</a>
+    <a href="#links">Links</a>
+  </nav>
+</header>
+
+<main>
+  <section id="intro">
+    <h1>NSI Designer</h1>
+    <p><strong>NSI Designer</strong> is a free PySide6 desktop application for creating 
+    Windows installers with the <em>Nullsoft Scriptable Install System (NSIS)</em>. 
+    It provides a graphical interface to generate and compile <code>.nsi</code> scripts 
+    without manual scripting. This documentation gives you a quickstart guide and explains 
+    all input fields, presets, and advanced options.</p>
+  </section>
+
+  <section id="install">
+    <h2>Installation</h2>
+    <p>You can install NSI Designer either via a prebuilt Windows installer or directly from PyPI. 
+    The PyPI package allows you to run the tool from the command line on any supported platform. 
+    Both methods provide the same functionality.</p>
+    <p><strong>Windows Installer:</strong> 
+      <a href="https://github.com/digidigital/nsi-designer/releases">Download from GitHub Releases</a></p>
+    <p><strong>PyPI:</strong></p>
+<pre><code>> pip install nsi-designer
+ > nsi_designer
+ or
+ > python -m nsi_designer
+</code></pre>
+  </section>
+
+  <section id="features">
+    <h2>Features</h2>
+    <p>NSI Designer streamlines the process of building Windows installers. 
+    Instead of writing NSIS scripts by hand, you can configure everything through a GUI 
+    and immediately preview the generated script.</p>
+    <ul>
+      <li>Automatic packaging of all files in the executable’s directory</li>
+      <li>Live preview of the generated NSIS script</li>
+      <li>Asset pickers with automatic format conversion (icons → .ico, bitmaps → .bmp)</li>
+      <li>Registry and environment variable editor</li>
+      <li>Language selection dialog (predefined set, always includes English)</li>
+      <li>Presets for install location, execution level, and scope</li>
+      <li>Export with encoding selection (UTF‑8 or ANSI cp1252)</li>
+      <li>Direct compilation with Makensis (path is requested if not known)</li>
+    </ul>
+  </section>
+
+  <section id="gui">
+    <h2>Graphical User Interface</h2>
+    <p>The GUI is divided into two panes. The left pane contains all input fields and tables 
+    for configuring your installer. The right pane shows a live preview of the NSIS script 
+    that will be generated based on your inputs.</p>
+    <ul>
+      <li><strong>Left pane:</strong> Input forms for metadata, presets, assets, languages, registry entries, and environment variables.</li>
+      <li><strong>Right pane:</strong> Live preview of the generated NSIS script.</li>
+    </ul>
+    <p>All changes are applied immediately and reflected in the preview.</p>
+  </section>
+  <section id="fields">
+    <h2>Input Fields and Tables</h2>
+    <p>This section describes all input fields available in the left pane of the GUI. 
+    Each field directly maps to values in the generated NSIS script. 
+    Understanding their meaning ensures that your installer behaves as expected.</p>
+
+    <h3>Metadata</h3>
+    <p>Metadata defines the identity of your installer. These values appear in window titles, 
+    uninstall entries, and shortcuts. They are also used in the generated script for consistency.</p>
+    <ul>
+      <li><strong>Application name</strong> – used in window titles, uninstall entries, and shortcuts</li>
+      <li><strong>Company name</strong> – appears in uninstall information</li>
+      <li><strong>Version</strong> – included in filenames and uninstall dialogs</li>
+      <li><strong>Caption</strong> – title bar text of the installer window</li>
+      <li><strong>About URL</strong> – optional link shown in the installer</li>
+      <li><strong>Branding text</strong> – small text displayed in the installer window</li>
+      <li><strong>Executable file</strong> – path to the main <code>.exe</code>; all files in the same directory are packaged</li>
+    </ul>
+
+    <h3>Presets</h3>
+    <p>Presets control where and how the installer runs. They determine the default installation 
+    directory, the required execution privileges, and whether the installer affects all users or only the current user.</p>
+    <ul>
+      <li><strong>Install location:</strong> 
+        <ul>
+          <li><em>64‑bit Program Files</em> – installs under <code>C:\Program Files</code> on 64‑bit systems.</li>
+          <li><em>32‑bit Program Files</em> – installs under <code>C:\Program Files (x86)</code> on 64‑bit systems, or <code>C:\Program Files</code> on 32‑bit systems.</li>
+          <li><em>Per‑user AppData</em> – installs under the current user’s <code>%LOCALAPPDATA%</code>, no admin rights required.</li>
+        </ul>
+      </li>
+      <li><strong>Execution level:</strong> 
+        <ul>
+          <li><em>admin</em> – installer requests elevation (UAC prompt) and writes to system‑wide locations.</li>
+          <li><em>user</em> – installer runs without elevation, limited to user‑writable locations.</li>
+        </ul>
+      </li>
+      <li><strong>Scope:</strong> 
+        <ul>
+          <li><em>System‑wide</em> – registry and environment changes apply to all users.</li>
+          <li><em>Per‑user</em> – registry and environment changes apply only to the current user.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>Assets</h3>
+    <p>Assets customize the look and feel of the installer. They are optional, but when provided, 
+    they enhance branding and user experience.</p>
+    <ul>
+      <li><strong>Install icon</strong> – optional</li>
+      <li><strong>Uninstall icon</strong> – optional</li>
+      <li><strong>Welcome bitmap</strong> – optional; if not provided, the welcome page is omitted</li>
+      <li><strong>License file</strong> – optional; only if an RTF file is selected, otherwise no license page is shown</li>
+    </ul>
+
+    <h3>Languages</h3>
+    <p>NSI Designer supports a predefined set of languages. English is always included automatically. 
+    The language dialog allows you to select additional languages from the available set.</p>
+
+    <h3>Registry Entries</h3>
+    <p>Registry entries allow you to configure system or application settings during installation. 
+    Each entry is mirrored during uninstall to ensure clean removal.</p>
+    <p>Table columns:</p>
+    <ul>
+      <li><strong>Root</strong></li>
+      <li><strong>Sub‑Key</strong></li>
+      <li><strong>Key‑Name</strong></li>
+      <li><strong>Value</strong></li>
+      <li><strong>Type</strong> – string or dword</li>
+    </ul>
+
+    <h3>Environment Variables</h3>
+    <p>Environment variables can be set or extended during installation. 
+    The uninstaller reverses these changes safely.</p>
+    <p>Table columns:</p>
+    <ul>
+      <li><strong>Name</strong></li>
+      <li><strong>Value</strong></li>
+      <li><strong>Mode</strong> – set or append</li>
+    </ul>
+    <p><strong>Important:</strong> Never use <code>set</code> mode for existing variables like <code>Path</code>, 
+    as this would overwrite the entire variable. Use <code>append</code> instead.</p>
+
+    <h3>Encoding & Export</h3>
+    <p>Encoding determines how the script is saved. Export and compile options let you generate 
+    the final installer package.</p>
+    <ul>
+      <li><strong>Encoding:</strong> ANSI or UTF‑8</li>
+      <li><strong>Export NSIS script and assets</strong></li>
+      <li><strong>Compile with NSIS</strong> – Makensis path is requested if not yet configured</li>
+    </ul>
+  </section>
+  <section id="power">
+    <h2>Power User Options</h2>
+    <p>Advanced users and system administrators can control the installer via command‑line flags. 
+    These options allow silent installs, logging, and custom installation paths. 
+    They are especially useful for automated deployments and scripted setups.</p>
+    <ul>
+      <li><code>/S</code> – Silent installation</li>
+      <li><code>/NOICONS</code> – Do not create shortcuts</li>
+      <li><code>/LOG[=path]</code> – Enable logging, optionally specify log file path</li>
+      <li><code>/D=path</code> – Set installation directory</li>
+    </ul>
+    <p><strong>Important:</strong> The <code>/D=path</code> parameter must always be the 
+    <em>last parameter</em> on the command line. The use of quotation marks (<code>"</code>) 
+    is prohibited, even if the path contains spaces.</p>
+  </section>
+
+  <section id="notes">
+    <h2>Notes & Best Practices</h2>
+    <p>Follow these guidelines to ensure safe and reliable installers. 
+    NSIS is powerful, but incorrect settings can cause issues during uninstall or system configuration. 
+    Always validate your configuration before distributing installers.</p>
+    <ul>
+      <li>Always test installers and uninstallers on a safe system before production use.</li>
+      <li>Registry edits must be handled with care – incorrect keys can cause uninstall issues.</li>
+      <li>Environment variables:
+        <ul>
+          <li>Use <code>append</code> mode for PATH‑like variables.</li>
+          <li>Never use <code>set</code> mode for existing variables such as <code>Path</code>.</li>
+        </ul>
+      </li>
+      <li>License and welcome pages are optional:
+        <ul>
+          <li>License page is only included if an RTF file is selected.</li>
+          <li>Welcome page is only included if a bitmap is selected.</li>
+        </ul>
+      </li>
+      <li>Makensis path is requested automatically if not yet configured.</li>
+    </ul>
+  </section>
+
+  <section id="links">
+    <h2>Useful Links</h2>
+    <p>Here are some resources to learn more about NSIS and NSI Designer:</p>
+    <ul>
+      <li><a href="https://nsis.sourceforge.io/Docs/">NSIS Script Documentation</a></li>
+      <li><a href="https://nsis.sourceforge.io/">Official NSIS Website</a></li>
+      <li><a href="https://github.com/digidigital/nsi-designer">NSI Designer GitHub Repository</a></li>
+      <li><a href="https://pypi.org/project/nsi-designer/">NSI Designer on PyPI</a></li>
+      <li><a href="https://nsis.sourceforge.io/Simple_tutorials">NSIS Tutorials</a></li>
+      <li><a href="https://nsis.sourceforge.io/Special:AllPages">NSIS Wiki (All Pages)</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+    2025 FOSS by Björn Seipel – digidigital - support﹫digidigtal.de
+</footer>
+</body>
+</html>
