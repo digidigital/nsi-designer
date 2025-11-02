@@ -3,52 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <title>NSI Designer – Documentation & Quickstart</title>
-  <meta name="description" content=""NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)" />
   <style>
+    :root {
+      --font-size-base: clamp(16px, 1.1vw, 18px);
+      --font-size-nav: clamp(16px, 1.1vw, 18px);
+    }
     body {
       margin: 0;
       font-family: "Segoe UI", Arial, sans-serif;
+      font-size: var(--font-size-base);
       line-height: 1.6;
       background: #fff;
       color: #222;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      background: rgba(17, 17, 17, 0.65); /* translucent black */
+      background: rgba(17, 17, 17, 0.85);
       color: #fff;
-      padding: 1rem 2rem;
+      padding: 0.8rem 1.2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 1000;
-      backdrop-filter: blur(5px); /* optional: adds a frosted glass effect */
+      backdrop-filter: blur(6px);
     }
-    header nav a {
+    header strong { font-size: 1.1rem; }
+    nav {
+      display: flex;
+      gap: 1.2rem;
+    }
+    nav a {
       color: #fff;
       text-decoration: none;
-      margin-left: 1.5rem;
       font-weight: 500;
+      font-size: var(--font-size-nav);
     }
-    header nav a:hover { text-decoration: underline; }
+    nav a:hover { text-decoration: underline; }
+    .menu-toggle {
+      display: none;
+      font-size: 1.6rem;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgba(17,17,17,0.95);
+        width: 220px;
+        padding: 1rem;
+      }
+      nav.show { display: flex; }
+      .menu-toggle { display: block; }
+    }
     main {
-      padding: 6rem 2rem 3rem;
+      padding: 6rem 1rem 3rem;
       max-width: 1000px;
       margin: auto;
     }
-    section { 
-      scroll-margin-top: 5rem;
-      margin-bottom: 4rem; }
-    h1, h2, h3 {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    h1 { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: .3rem; }
-    h2 { font-size: 1.4rem; margin-top: 2rem; }
+    section { scroll-margin-top: 5rem; margin-bottom: 4rem; }
+    h1, h2, h3 { font-weight: 600; margin-bottom: 0.5rem; }
+    h1 { font-size: 1.8rem; border-bottom: 2px solid #000; padding-bottom: .3rem; }
+    h2 { font-size: 1.3rem; margin-top: 2rem; }
     h3 { font-size: 1.1rem; margin-top: 1.5rem; }
     ul { list-style: square; padding-left: 1.2rem; }
     code {
@@ -74,6 +100,7 @@
 <body>
 <header>
   <div><strong>NSI Designer</strong></div>
+  <button class="menu-toggle" aria-label="Menu">☰</button>
   <nav>
     <a href="#intro">Introduction</a>
     <a href="#install">Installation</a>
@@ -87,7 +114,7 @@
 </header>
 
 <main id="intro">
-  <section >
+  <section>
     <h1>NSI Designer</h1>
     <p><strong>NSI Designer</strong> is a free PySide6 desktop application for creating 
     Windows installers with the <em>Nullsoft Scriptable Install System (NSIS)</em>. 
@@ -111,7 +138,6 @@
  > python -m nsi_designer
 </code></pre>
   </section>
-
   <section id="features">
     <h2>Features ✨</h2>
     <p>NSI Designer streamlines the process of building Windows installers. 
@@ -139,7 +165,10 @@
       <li><strong>Right pane:</strong> Live preview of the generated NSIS script.</li>
     </ul>
     <p>All changes are applied immediately and reflected in the preview.</p>
+    <p>If you need to pause your work or save it for later use, you’ll find the corresponding option in the menu bar under <b>“File”</b>. 
+    The current project, along with all specified parameters, is stored in <b>JSON</b> format and can be reloaded at any time in the future.</p>
   </section>
+
   <section id="fields">
     <h2>Input Fields and Tables ⌨️</h2>
     <p>This section describes all input fields available in the left pane of the GUI. 
@@ -147,8 +176,6 @@
     Understanding their meaning ensures that your installer behaves as expected.</p>
 
     <h3>Metadata</h3>
-    <p>Metadata defines the identity of your installer. These values appear in window titles, 
-    uninstall entries, and shortcuts. They are also used in the generated script for consistency.</p>
     <ul>
       <li><strong>Application name</strong> – used in window titles, uninstall entries, and shortcuts</li>
       <li><strong>Company name</strong> – appears in uninstall information</li>
@@ -160,8 +187,6 @@
     </ul>
 
     <h3>Presets</h3>
-    <p>Presets control where and how the installer runs. They determine the default installation 
-    directory, the required execution privileges, and whether the installer affects all users or only the current user.</p>
     <ul>
       <li><strong>Install location:</strong> 
         <ul>
@@ -185,8 +210,6 @@
     </ul>
 
     <h3>Assets</h3>
-    <p>Assets customize the look and feel of the installer. They are optional, but when provided, 
-    they enhance branding and user experience.</p>
     <ul>
       <li><strong>Install icon</strong> – optional (.ico, .png or .jpg)</li>
       <li><strong>Uninstall icon</strong> – optional (.ico, .png or .jpg)</li>
@@ -203,11 +226,18 @@
     Each entry is mirrored during uninstall to ensure clean removal.</p>
     <p>Table columns:</p>
     <ul>
-      <li><strong>Root</strong></li>
-      <li><strong>Sub‑Key</strong></li>
-      <li><strong>Key‑Name</strong></li>
-      <li><strong>Value</strong></li>
-      <li><strong>Type</strong> – string or dword</li>
+      <li><strong>Root</strong> – the top‑level registry hive where the entry is stored, e.g. 
+          <ul>
+            <li><code>HKLM</code> (HKEY_LOCAL_MACHINE) for system‑wide settings or 
+            <li>    <code>HKCU</code> (HKEY_CURRENT_USER) for per‑user settings.</li>
+            </ul>  
+      <li><strong>Sub‑Key</strong> – the path inside the hive, similar to a folder structure, 
+          e.g. <code>Software\MyApp</code>.</li>
+      <li><strong>Key‑Name</strong> – the actual name of the registry value you want to create or modify, 
+          e.g. <code>InstallPath</code>.</li>
+      <li><strong>Value</strong> – the data assigned to the key, e.g. <code>C:\Program Files\MyApp</code>.</li>
+      <li><strong>Type</strong> – the data type of the value, typically <em>string</em> (REG_SZ) 
+          for text or <em>dword</em> (REG_DWORD) for numeric values.</li>
     </ul>
 
     <h3>Environment Variables</h3>
@@ -215,21 +245,25 @@
     The uninstaller reverses these changes safely.</p>
     <p>Table columns:</p>
     <ul>
-      <li><strong>Name</strong></li>
-      <li><strong>Value</strong></li>
-      <li><strong>Mode</strong> – set or append</li>
+      <li><strong>Name</strong> – the identifier of the environment variable, e.g. <code>PATH</code> or <code>JAVA_HOME</code>.</li>
+      <li><strong>Value</strong> – the content to assign or append, e.g. <code>C:\Program Files\MyApp\bin</code>.</li>
+      <li><strong>Mode</strong> – defines how the variable is handled:
+        <ul>
+          <li><em>set</em> – creates a new variable or overwrites an existing one with the given value.</li>
+          <li><em>append</em> – adds the value to the end of an existing variable (commonly used for <code>PATH</code>).</li>
+        </ul>
+      </li>
     </ul>
     <p><strong>Important:</strong> Never use <code>set</code> mode for existing variables like <code>Path</code>, 
     as this would overwrite the entire variable. Use <code>append</code> instead.</p>
 
     <h3>Encoding & Export</h3>
-    <p>Encoding determines how the script is saved. Export and compile options let you generate 
-    the final installer package.</p>
     <ul>
       <li><strong>Encoding:</strong> ANSI or UTF‑8</li>
-      <li><strong>Export NSIS script and assets</strong></li>
+      <li><strong>Export NSIS script and assets</strong>  – Triggers the export of the script and icon conversion </li>
       <li><strong>Compile with NSIS</strong> – Makensis path is requested if not yet configured</li>
     </ul>
+    <p><strong>Important:</strong> The export step does not save your project! Use the <em>Save</em> option under "File" in the menu bar to save your project.</p>
   </section>
   <section id="power">
     <h2>Power User Options 🦾</h2>
@@ -258,7 +292,7 @@
       <li>Environment variables:
         <ul>
           <li>Use <code>append</code> mode for PATH‑like variables.</li>
-          <li>Never use <code>set</code> mode for existing variables such as <code>Path</code>.</li>
+          <li>Never use <code>set</code> mode for existing variables such as <code>PATH</code>.</li>
         </ul>
       </li>
       <li>License and welcome pages are optional:
@@ -286,7 +320,16 @@
 </main>
 
 <footer>
-    2025 FOSS by 🙋 Björn Seipel – digidigital - support﹫digidigtal.de
+    2025 FOSS by 🙋 Björn Seipel – digidigital - support﹫digidigital.de
 </footer>
+
+<script>
+  // Burger Menu Toggle
+  const toggle = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('header nav');
+  toggle.addEventListener('click', () => {
+    nav.classList.toggle('show');
+  });
+</script>
 </body>
 </html>
