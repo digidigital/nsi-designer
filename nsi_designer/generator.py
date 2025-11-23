@@ -364,6 +364,8 @@ def build_script(model: ProjectModel, exported_paths: dict[str, str]) -> str:
         f'  WriteRegStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "QuietUninstallString" \'"$INSTDIR\\Uninstall.exe" /S\'',
         f'  WriteRegStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "DisplayIcon" "$INSTDIR\\{exe_basename}"',
         f'  WriteRegStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "Publisher" "${{COMPANYNAME}}"',
+        f'  WriteRegStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "URLInfoAbout" "${{ABOUTURL}}"',
+        f'  WriteRegStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "HelpLink" "${{ABOUTURL}}"',
         f'  WriteRegExpandStr {uninstall_root} "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${{APPNAME}}" "InstallLocation" "$INSTDIR"',
         '  WriteUninstaller "$INSTDIR\\Uninstall.exe"',
         "",
