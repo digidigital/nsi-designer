@@ -1,11 +1,11 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, fields, asdict
 from typing import List, Dict, Any, Optional
 import json
 import os
 
 
-REG_ROOT_OPTIONS = ["HKLM", "HKCU", "HKCR", "HKU", "HKCC", "HKDD", "HKPD", "SHCTX"]
+REG_ROOT_OPTIONS = ["HKLM", "HKCU"]
 ENV_MODE_OPTIONS = ["set", "append"]
 
 # Available NSIS languages (European and American) mapped to NSIS macro codes
@@ -50,8 +50,13 @@ class ProjectModel:
     version: str = "0.1.0"
     caption: str = "Installation Wizard"
     about_url: str = ""
+    help_url: str = ""
     branding_text: str = "A John Doe project"
     exe_path: str = ""  # Selected .exe path
+    estimated_size: int = 0
+    update_url: str = ""
+    comments: str = "" 
+    contact: str = "" 
 
     # Presets
     install_dir_preset: str = "64-bit"  # "64-bit", "32-bit", "Per-user"
@@ -87,15 +92,21 @@ class ProjectModel:
         return json.dumps(asdict(self), indent=2)
 
     @staticmethod
-    def from_json(data: str) -> ProjectModel:
-        """Deserialize project from JSON string."""
+    def from_json(data: str) -> "ProjectModel":
         obj = json.loads(data)
-        # Rebuild dataclasses for lists of rows
+
         reg_rows = [RegistryRow(**row) for row in obj.get("registry_rows", [])]
         env_rows = [EnvRow(**row) for row in obj.get("env_rows", [])]
-        obj["registry_rows"] = reg_rows
-        obj["env_rows"] = env_rows
-        return ProjectModel(**obj)
+
+        # Only keep keys that match ProjectModel fields
+        valid_field_names = {f.name for f in fields(ProjectModel)}
+        filtered_obj = {k: v for k, v in obj.items() if k in valid_field_names and k not in ("registry_rows", "env_rows")}
+
+        return ProjectModel(
+            registry_rows=reg_rows,
+            env_rows=env_rows,
+            **filtered_obj
+        )
 
     def is_per_user(self) -> bool:
         """Return True if scope or preset implies per-user context."""
@@ -127,4 +138,4 @@ class ProjectModel:
 
     def encoding_codec(self) -> str:
         """Return Python codec name based on encoding selection."""
-        return "utf-8" if self.encoding == "UTF-8" else "cp1252"
+        return "utf-8" if self.encoding == "UTF-8" else "mbcs"

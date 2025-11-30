@@ -9,9 +9,31 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction
 from .model import ProjectModel, RegistryRow, EnvRow, REG_ROOT_OPTIONS, ENV_MODE_OPTIONS, AVAILABLE_LANGUAGES
+import os
+
+# --- Helper class ---
+class AutoLabel(QLabel):
+    """Drop-in replacement for QComboBox that only displays text but keeps currentText() API."""
+    def __init__(self, text=""):
+        super().__init__(text)
+        self._text = text
+
+    def setText(self, text: str):
+        """Set label text and store internally."""
+        super().setText(text)
+        self._text = text
+
+    def currentText(self) -> str:
+        """Return stored text (mimics QComboBox.currentText)."""
+        return self._text
+
+    def setCurrentText(self, text: str):
+        """Set text via currentText API for compatibility."""
+        self.setText(text)
 
 
 class LanguageDialog(QDialog):
+    """Dialog for selecting installer languages."""
     def __init__(self, parent=None, selected: List[str] | None = None):
         super().__init__(parent)
         self.setWindowTitle("Select languages")
@@ -33,6 +55,7 @@ class LanguageDialog(QDialog):
         layout.addWidget(btns)
 
     def get_selection(self) -> List[str]:
+        """Return selected languages, always including English."""
         langs = [cb.text() for cb in self.checkboxes if cb.isChecked()]
         if "English" not in langs:
             langs.insert(0, "English")
@@ -40,6 +63,7 @@ class LanguageDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
+    """Main application window for NSI Script Designer."""
     def __init__(self, project: ProjectModel, on_generate: Callable[[ProjectModel], str],
                  on_export: Callable[[ProjectModel], None],
                  on_compile: Callable[[ProjectModel], None]):
@@ -72,7 +96,6 @@ class MainWindow(QMainWindow):
         act_new.triggered.connect(self._new_project)
         act_open.triggered.connect(self._open_project)
         act_save.triggered.connect(self._save_project)
-
         # --- Central layout ---
         root = QWidget()
         self.setCentralWidget(root)
@@ -86,15 +109,65 @@ class MainWindow(QMainWindow):
         left_layout.setContentsMargins(8, 8, 8, 8)
         left_layout.setSpacing(8)
 
-        # Metadata form
-        meta_form = QFormLayout()
-        self.le_appname = QLineEdit(self.project.app_name)
-        self.le_company = QLineEdit(self.project.company_name)
-        self.le_version = QLineEdit(self.project.version)
-        self.le_caption = QLineEdit(self.project.caption)
-        self.le_about = QLineEdit(self.project.about_url)
-        self.le_branding = QLineEdit(self.project.branding_text)
+        # Metadata form (use QGridLayout for consistent alignment)
+        meta_form = QGridLayout()
 
+        # Application name + Version
+        lbl_app = QLabel("Application name:")
+        self.le_appname = QLineEdit(self.project.app_name)
+        lbl_ver = QLabel("Version:")
+        self.le_version = QLineEdit(self.project.version)
+        meta_form.addWidget(lbl_app, 0, 0)
+        meta_form.addWidget(self.le_appname, 0, 1)
+        meta_form.addWidget(lbl_ver, 0, 2)
+        meta_form.addWidget(self.le_version, 0, 3)
+
+        # Company name (single row, spans first two columns)
+        lbl_company = QLabel("Company name:")
+        self.le_company = QLineEdit(self.project.company_name)
+        meta_form.addWidget(lbl_company, 1, 0)
+        meta_form.addWidget(self.le_company, 1, 1, 1, 3)
+
+        # Caption (single row)
+        lbl_caption = QLabel("Caption:")
+        self.le_caption = QLineEdit(self.project.caption)
+        meta_form.addWidget(lbl_caption, 2, 0)
+        meta_form.addWidget(self.le_caption, 2, 1, 1, 3)
+        
+        # Branding text (single row)
+        lbl_branding = QLabel("Branding text:")
+        self.le_branding = QLineEdit(self.project.branding_text)
+        meta_form.addWidget(lbl_branding, 3, 0)
+        meta_form.addWidget(self.le_branding, 3, 1, 1, 3)
+        
+        # About URL + Help URL
+        lbl_about = QLabel("About URL:")
+        self.le_about = QLineEdit(self.project.about_url)
+        lbl_help = QLabel("Help URL:")
+        self.le_help = QLineEdit(self.project.help_url)
+        meta_form.addWidget(lbl_about, 4, 0)
+        meta_form.addWidget(self.le_about, 4, 1)
+        meta_form.addWidget(lbl_help, 4, 2)
+        meta_form.addWidget(self.le_help, 4, 3)
+
+        # Update URL + Contact
+        lbl_update = QLabel("Update URL:")
+        self.le_update = QLineEdit(self.project.update_url)
+        lbl_contact = QLabel("Email:")
+        self.le_contact = QLineEdit(self.project.contact)
+        meta_form.addWidget(lbl_update, 5, 0)
+        meta_form.addWidget(self.le_update, 5, 1)
+        meta_form.addWidget(lbl_contact, 5, 2)
+        meta_form.addWidget(self.le_contact, 5, 3)
+
+        # Comments (single row)
+        lbl_comments = QLabel("Comments:")
+        self.le_comments = QLineEdit(self.project.comments)
+        meta_form.addWidget(lbl_comments, 6, 0)
+        meta_form.addWidget(self.le_comments, 6, 1, 1, 3)
+
+        # Executable file row with choose/clear buttons
+        lbl_exe = QLabel("Executable file:")
         exe_row = QWidget()
         exe_layout = QHBoxLayout(exe_row)
         exe_layout.setContentsMargins(0, 0, 0, 0)
@@ -104,29 +177,23 @@ class MainWindow(QMainWindow):
         exe_layout.addWidget(self.le_exe, 1)
         exe_layout.addWidget(btn_exe_choose)
         exe_layout.addWidget(btn_exe_clear)
+        meta_form.addWidget(lbl_exe, 7, 0)
+        meta_form.addWidget(exe_row, 7, 1, 1, 3)
 
-        meta_form.addRow("Application name:", self.le_appname)
-        meta_form.addRow("Company name:", self.le_company)
-        meta_form.addRow("Version:", self.le_version)
-        meta_form.addRow("Caption:", self.le_caption)
-        meta_form.addRow("About URL:", self.le_about)
-        meta_form.addRow("Branding text:", self.le_branding)
-        meta_form.addRow("Executable file:", exe_row)
         # Presets
         preset_form = QFormLayout()
         self.cb_install_loc = QComboBox()
         self.cb_install_loc.addItems(["64-bit (ProgramFiles64)", "32-bit (ProgramFiles32)", "Per-user (AppData)"])
-        self.cb_exec_level = QComboBox()
-        self.cb_exec_level.addItems(["admin", "user"])
-        self.cb_scope = QComboBox()
-        self.cb_scope.addItems(["System-wide", "Per-user"])
+        # Execution level and Scope now AutoLabels (drop-in replacements)
+        self.cb_exec_level = AutoLabel(self.project.exec_level)
+        self.cb_scope = AutoLabel(self.project.scope)
         preset_form.addRow("Install location:", self.cb_install_loc)
         preset_form.addRow("Execution level:", self.cb_exec_level)
         preset_form.addRow("Scope:", self.cb_scope)
-
         # Assets
         assets_form = QFormLayout()
         def mk_asset_row(line_edit: QLineEdit) -> QWidget:
+            """Helper to create asset row with choose/clear buttons."""
             w = QWidget()
             hl = QHBoxLayout(w)
             hl.setContentsMargins(0, 0, 0, 0)
@@ -219,6 +286,7 @@ class MainWindow(QMainWindow):
         left_layout.addStretch(1)
         left_layout.addWidget(bottom_row)
         splitter.addWidget(left)
+
         # Right pane
         right = QWidget()
         right_layout = QVBoxLayout(right)
@@ -234,6 +302,7 @@ class MainWindow(QMainWindow):
 
         # --- Wiring ---
         def regen():
+            """Regenerate preview text from project model."""
             self.preview.setPlainText(self.generate(self.project))
 
         # Metadata
@@ -243,6 +312,10 @@ class MainWindow(QMainWindow):
         self.le_caption.textChanged.connect(lambda t: setattr(self.project, "caption", t) or regen())
         self.le_about.textChanged.connect(lambda t: setattr(self.project, "about_url", t) or regen())
         self.le_branding.textChanged.connect(lambda t: setattr(self.project, "branding_text", t) or regen())
+        self.le_help.textChanged.connect(lambda t: setattr(self.project, "help_url", t) or regen())       
+        self.le_update.textChanged.connect(lambda t: setattr(self.project, "update_url", t) or regen())   
+        self.le_comments.textChanged.connect(lambda t: setattr(self.project, "comments", t) or regen())   
+        self.le_contact.textChanged.connect(lambda t: setattr(self.project, "contact", t) or regen())     
 
         # Executable
         btn_exe_choose.clicked.connect(self._choose_exe)
@@ -251,8 +324,7 @@ class MainWindow(QMainWindow):
 
         # Presets
         self.cb_install_loc.currentTextChanged.connect(self._on_install_loc_changed(regen))
-        self.cb_exec_level.currentTextChanged.connect(lambda t: setattr(self.project, "exec_level", t) or regen())
-        self.cb_scope.currentTextChanged.connect(lambda t: setattr(self.project, "scope", t) or regen())
+        # Execution level and scope are now AutoLabels, updated automatically in _on_install_loc_changed
 
         # Assets
         install_icon_row.btn_choose.clicked.connect(lambda: self._choose_asset(self.le_install_icon, "Select icon", ["*.ico","*.png","*.jpg"], "install_icon_path", regen))
@@ -285,23 +357,32 @@ class MainWindow(QMainWindow):
         regen()
     # --- Menu actions ---
     def _new_project(self):
+        """Create a new blank project and reset export state."""
         self.project = ProjectModel()
+        # reset export state for new project
+        self.project.export_dir = None
+        self.project.has_exported_in_session = False
         self._reload_from_project()
 
     def _open_project(self):
+        """Open a project from JSON file."""
         path, _ = QFileDialog.getOpenFileName(self, "Open Project", "", "JSON (*.json)")
         if path:
             with open(path, "r", encoding="utf-8") as f:
                 data = f.read()
             self.project = ProjectModel.from_json(data)
+            # reset export state when loading a project
+            self.project.export_dir = None
+            self.project.has_exported_in_session = False
             self._reload_from_project()
 
     def _save_project(self):
+        """Save current project to JSON file."""
         path, _ = QFileDialog.getSaveFileName(self, "Save Project", "", "JSON (*.json)")
         if path:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(self.project.to_json())
-
+                
     def _reload_from_project(self):
         """Update all UI fields from current project model."""
         p = self.project
@@ -310,11 +391,16 @@ class MainWindow(QMainWindow):
         self.le_version.setText(p.version)
         self.le_caption.setText(p.caption)
         self.le_about.setText(p.about_url)
+        self.le_help.setText(p.help_url)           
+        self.le_update.setText(p.update_url)       
+        self.le_comments.setText(p.comments)       
+        self.le_contact.setText(p.contact)         
         self.le_branding.setText(p.branding_text)
         self.le_exe.setText(p.exe_path)
         self.cb_install_loc.setCurrentIndex(0 if p.install_dir_preset=="64-bit" else 1 if p.install_dir_preset=="32-bit" else 2)
-        self.cb_exec_level.setCurrentText(p.exec_level)
-        self.cb_scope.setCurrentText(p.scope)
+        # Execution level and scope are AutoLabels now
+        self.cb_exec_level.setText(p.exec_level)
+        self.cb_scope.setText(p.scope)
         self.le_install_icon.setText(p.install_icon_path)
         self.le_uninstall_icon.setText(p.uninstall_icon_path)
         self.le_welcome_bmp.setText(p.welcome_bitmap_path)
@@ -346,12 +432,30 @@ class MainWindow(QMainWindow):
         self.preview.setPlainText(self.generate(self.project))
 
     # --- Helpers ---
+    def _calc_estimated_size_kb(self, inst_dir: str) -> int:
+        """Calculate estimated installation size in KB for given directory."""
+        total_bytes = 0
+        for root, dirs, files in os.walk(inst_dir):
+            for f in files:
+                fp = os.path.join(root, f)
+                try:
+                    total_bytes += os.path.getsize(fp)
+                except OSError:
+                    pass
+        return (total_bytes + 1023) // 1024
+
     def _choose_exe(self):
+        """Choose executable file and update estimated size."""
         path, _ = QFileDialog.getOpenFileName(self, "Choose executable", "", "Executable (*.exe)")
         if path:
+            try:
+                self.project.estimated_size = self._calc_estimated_size_kb(os.path.dirname(path))
+            except Exception:
+                self.project.estimated_size = 0
             self.le_exe.setText(path)
 
     def _choose_asset(self, line_edit: QLineEdit, title: str, filters: List[str], attr: str, regen: Callable):
+        """Choose asset file (icon, bitmap, license) and update project."""
         flt = ";;".join([f"{f} ({f})" for f in filters])
         path, _ = QFileDialog.getOpenFileName(self, title, "", flt)
         if path:
@@ -360,21 +464,34 @@ class MainWindow(QMainWindow):
             regen()
 
     def _on_install_loc_changed(self, regen: Callable):
+        """Update install location preset and auto-adjust execution level/scope labels."""
         def _handler(text: str):
-            preset = "64-bit" if "64-bit" in text else "32-bit" if "32-bit" in text else "Per-user"
-            setattr(self.project, "install_dir_preset", preset)
+            if "Per-user" in text:
+                setattr(self.project, "install_dir_preset", "Per-user")
+                self.cb_exec_level.setText("user")
+                self.cb_scope.setText("Per-user")
+                self.project.exec_level = "user"
+                self.project.scope = "Per-user"
+            else:
+                preset = "64-bit" if "64-bit" in text else "32-bit"
+                setattr(self.project, "install_dir_preset", preset)
+                self.cb_exec_level.setText("admin")
+                self.cb_scope.setText("System-wide")
+                self.project.exec_level = "admin"
+                self.project.scope = "System-wide"
             regen()
         return _handler
 
     def _select_languages(self):
+        """Open language selection dialog and update project."""
         dlg = LanguageDialog(self, selected=self.project.languages)
         if dlg.exec():
             langs = dlg.get_selection()
             self.project.languages = langs
             self.le_languages.setText(", ".join(langs))
             self.preview.setPlainText(self.generate(self.project))
-
     def _add_registry_row(self, regen: Callable):
+        """Add a new registry row to the table and project model."""
         row = self.tbl_registry.rowCount()
         self.tbl_registry.insertRow(row)
         cb_root = QComboBox()
@@ -392,8 +509,8 @@ class MainWindow(QMainWindow):
         self.project.registry_rows.append(RegistryRow())
         regen()
 
-
     def _sync_registry_from_table(self, regen: Callable):
+        """Synchronize registry rows from table into project model."""
         rows: List[RegistryRow] = []
         for r in range(self.tbl_registry.rowCount()):
             root_widget = self.tbl_registry.cellWidget(r, 0)
@@ -415,6 +532,7 @@ class MainWindow(QMainWindow):
         regen()
 
     def _add_env_row(self, regen: Callable):
+        """Add a new environment variable row to the table and project model."""
         row = self.tbl_env.rowCount()
         self.tbl_env.insertRow(row)
         self.tbl_env.setItem(row, 0, QTableWidgetItem(""))
@@ -427,6 +545,7 @@ class MainWindow(QMainWindow):
         regen()
 
     def _sync_env_from_table(self, regen: Callable):
+        """Synchronize environment variable rows from table into project model."""
         rows: List[EnvRow] = []
         for r in range(self.tbl_env.rowCount()):
             name_item = self.tbl_env.item(r, 0)
@@ -440,10 +559,3 @@ class MainWindow(QMainWindow):
             ))
         self.project.env_rows = rows
         regen()
-
-    def _delete_selected_row(self, table: QTableWidget, model_list: list, regen: Callable):
-        row = table.currentRow()
-        if row >= 0 and row < len(model_list):
-            table.removeRow(row)
-            del model_list[row]
-            regen()

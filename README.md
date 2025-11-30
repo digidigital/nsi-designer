@@ -9,8 +9,8 @@
 - Set Registry values and environment variables 
 - Language selection dialog
 - Presets for install location, execution level, and scope
-- Export with encoding selection (UTF-8 or ANSI cp1252) 
-- Optional flags /S (silent), /NOICONS (do not create shortcuts), /LOG=[path] (logging) and /D=[path (always without "!)]
+- Export with encoding selection (UTF-8 or ANSI) 
+- Optional flags /S (silent), /NOICONS (do not create shortcuts), /LOG=[path] (logging) and /D=[path (always without Quotes!)]
 - Makensis integration to compile the script directly from within the app
 
 ## What is NSI Designer?
@@ -31,7 +31,7 @@ Whether you call it an **installer maker, setup creator, or installer generator*
 
 Get the latest Installer: https://github.com/digidigital/nsi-designer/releases
 
-## Install via pypi
+## Install via PyPi
 
 Install via pypi and run from command line:
 
@@ -41,15 +41,13 @@ or
 
 `python -m nsi_designer`
 
+## NSIS (Nullsoft Scriptable Install System) 
 
-## Documentation
-
-Visit https://nsi-designer.digidigital.de for a brief introduction and description of the application.
+Don´t forget to install NSIS - https://nsis.sourceforge.io/ - since you need it to compile the scripts.
 
 ## Notes
 - Asset conversions happen on export using Pillow.
-- Makensis path is stored in QSettings after first selection if not found.
 - The uninstaller reverses all installer actions, including registry and environment changes (safe append removal).
 - Always manually check the script and test the installer prior to production use!
-- If you mess with the registry things can go terribly wrong on uninstall if you do not take care that everithing is set up correctly. 
+- If you mess with the registry things can go terribly wrong on uninstall if you do not take care that everything is set up correctly. 
 - NEVER use set-Mode with existing environment variables (like Path)
