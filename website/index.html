@@ -4,77 +4,274 @@
   <meta charset="UTF-8">
   <title>NSI Designer – Documentation & Quickstart</title>
   <meta name="description" content=""NSI Designer is a free desktop application for creating Windows installers with the Nullsoft Scriptable Install System (NSIS)" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <style>
+    :root {
+      /* Base palette */
+      --bg: #fff;
+      --text: #222;
+      --muted: #666;
+      --border: #ddd;
+      --header-bg: rgba(17, 17, 17, 0.65);
+      --link: #0a66c2;
+      --link-hover: #084b8a;
+
+      /* Card styling */
+      --card-bg: #ffffff;
+      --card-shadow: 0 6px 18px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.06);
+      --card-radius: 12px;
+
+      /* Typography scaling */
+      --font-size-base: clamp(16px, 1.2vw, 18px);
+      --h1-size: clamp(2rem, 3vw, 2.6rem);
+      --h2-size: clamp(1.6rem, 2.4vw, 2rem);
+      --h3-size: clamp(1.2rem, 1.8vw, 1.35rem);
+      --code-size: clamp(0.95em, 1.1vw, 1.05em);
+
+      /* Layout widths */
+      --main-max: 1000px;
+      --text-measure: 70ch;
+
+      /* Header */
+      --header-blur: 5px;
+
+      /* Transitions */
+      --transition-fast: 0.25s ease;
+      --transition-normal: 0.3s ease;
+
+      /* Mobile breakpoint */
+      --bp-mobile: 1000px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111315;
+        --text: #e8eaed;
+        --muted: #b0b6bd;
+        --border: #2a2f35;
+        --header-bg: rgba(20, 22, 24, 0.7);
+        --link: #64b5f6;
+        --link-hover: #42a5f5;
+        --card-bg: #171a1d;
+        --card-shadow: 0 10px 24px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.25);
+      }
+    }
+
+    /* Global */
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: "Segoe UI", Arial, sans-serif;
       line-height: 1.6;
-      background: #fff;
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
+      font-size: var(--font-size-base);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    a { color: var(--link); }
+    a:hover { color: var(--link-hover); }
+
+    /* Header with responsive nav */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      background: rgba(17, 17, 17, 0.65); /* translucent black */
+      background: var(--header-bg);
       color: #fff;
-      padding: 1rem 2rem;
+      padding: 0.8rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 1000;
-      backdrop-filter: blur(5px); /* optional: adds a frosted glass effect */
+      backdrop-filter: blur(var(--header-blur));
+    }
+    header .brand {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      font-size: clamp(1rem, 2vw, 1.1rem);
+    }
+    header nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
     header nav a {
       color: #fff;
       text-decoration: none;
-      margin-left: 1.5rem;
+      margin-left: 0.5rem;
       font-weight: 500;
+      font-size: clamp(0.95rem, 1.6vw, 1rem);
+      padding: 0.4rem 0.3rem;
+      border-radius: 6px;
     }
     header nav a:hover { text-decoration: underline; }
+
+    /* Hamburger button */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 8px;
+      outline: none;
+    }
+    .menu-toggle:focus-visible {
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.35);
+    }
+    .menu-toggle svg {
+      width: clamp(22px, 3.2vw, 28px);
+      height: clamp(22px, 3.2vw, 28px);
+    }
+
+    /* Mobile nav panel */
+    .mobile-nav {
+      position: fixed;
+      top: 56px; /* below header */
+      right: 0;
+      left: 0;
+      background: rgba(17, 17, 17, 0.90);
+      backdrop-filter: blur(var(--header-blur));
+      color: #fff;
+      display: none;
+      flex-direction: column;
+      padding: 0.8rem 1rem;
+      gap: 0.4rem;
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .mobile-nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: clamp(1rem, 2.8vw, 1.05rem);
+      padding: 0.8rem 0.6rem;
+      border-radius: 6px;
+    }
+    .mobile-nav a:hover { background: rgba(255,255,255,0.08); }
+
+    /* Main layout */
     main {
       padding: 6rem 2rem 3rem;
-      max-width: 1000px;
+      max-width: var(--main-max);
       margin: auto;
     }
-    section { 
+
+    /* Fancy section cards */
+    section {
       scroll-margin-top: 5rem;
-      margin-bottom: 4rem; }
+      margin-bottom: 2.2rem;
+      background: var(--card-bg);
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      padding: clamp(1rem, 2.4vw, 1.5rem);
+      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+    section:hover {
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Typographic scaling and readable measure on wide screens */
     h1, h2, h3 {
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
-    h1 { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: .3rem; }
-    h2 { font-size: 1.4rem; margin-top: 2rem; }
-    h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+    h1 {
+      font-size: var(--h1-size);
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.3rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      h1 { border-bottom-color: var(--border); }
+    }
+    h2 { font-size: var(--h2-size); margin-top: 1.2rem; }
+    h3 { font-size: var(--h3-size); margin-top: 1rem; }
+
+    
+    section p, section ul, section pre {
+      max-width: 100%; /* volle Breite innerhalb der Cards */
+    }
+
     ul { list-style: square; padding-left: 1.2rem; }
+
+    /* Code blocks scale with text */
     code {
       background: #f4f4f4;
       padding: 0.2rem 0.4rem;
       border-radius: 3px;
-      font-size: 0.95em;
+      font-size: var(--code-size);
+    }
+    @media (prefers-color-scheme: dark) {
+      code { background: #22262a; }
     }
     pre {
       background: #f4f4f4;
-      padding: 1rem;
+      padding: clamp(0.8rem, 2vw, 1rem);
       overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: var(--code-size);
     }
+    @media (prefers-color-scheme: dark) {
+      pre { background: #1b1f24; }
+    }
+
+    /* Footer */
     footer {
       text-align: center;
       padding: 2rem;
-      font-size: 0.9rem;
-      color: #666;
-      border-top: 1px solid #ddd;
+      font-size: clamp(0.9rem, 1.4vw, 1rem);
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      max-width: var(--main-max);
+      margin: 0 auto;
+    }
+
+    /* Privacy policy transition box */
+    #datenschutz {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: all var(--transition-normal);
+    }
+    #datenschutz.open {
+      max-height: 2000px; /* sufficiently large for content */
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive navigation */
+    @media (max-width: 1000px) {
+      header nav {
+        display: none;
+      }
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .mobile-nav.open {
+        display: flex;
+      }
+      main {
+        padding: 5.6rem 1rem 2.4rem;
+      }
     }
   </style>
 </head>
 <body>
 <header>
-  <div><strong>NSI Designer</strong></div>
-  <nav>
+  <div class="brand"><strong>NSI Designer</strong></div>
+  <nav aria-label="Primary">
     <a href="#intro">Introduction</a>
     <a href="#install">Installation</a>
     <a href="#features">Features</a>
@@ -84,7 +281,26 @@
     <a href="#notes">Notes</a>
     <a href="#links">Links</a>
   </nav>
+  <button class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  </button>
 </header>
+
+<div id="mobile-nav" class="mobile-nav" role="dialog" aria-modal="false" aria-label="Mobile navigation">
+  <a href="#intro">Introduction</a>
+  <a href="#install">Installation</a>
+  <a href="#features">Features</a>
+  <a href="#gui">GUI</a>
+  <a href="#fields">Input Fields</a>
+  <a href="#power">Power Users</a>
+  <a href="#notes">Notes</a>
+  <a href="#links">Links</a>
+</div>
 
 <main id="intro">
   <section >
@@ -326,23 +542,55 @@
   </div>
 </footer>
 <script>
-  // Datenschutzhinweis Toggle (versteckt / zeigt Inhalt)
+  // Header mobile menu toggle
+  (function(){
+    const toggle = document.querySelector('.menu-toggle');
+    const mobile = document.getElementById('mobile-nav');
+
+    if (!toggle || !mobile) return;
+
+    function closeMenuOnNavigate(e) {
+      if (e.target.tagName === 'A') {
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-modal', 'false');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isOpen = mobile.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      mobile.setAttribute('aria-modal', isOpen ? 'true' : 'false');
+    });
+
+    mobile.addEventListener('click', closeMenuOnNavigate);
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-modal', 'false');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+
+  // Datenschutzhinweis Toggle (versteckt / zeigt Inhalt) mit sanfter Transition
   (function(){
     const link = document.getElementById('datenschutz-link');
     const box = document.getElementById('datenschutz');
     if (!link || !box) return;
+
     // initial versteckt
-    box.style.display = 'none';
     link.setAttribute('aria-expanded', 'false');
     box.setAttribute('aria-hidden', 'true');
+    box.classList.remove('open'); // ensure closed state
 
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      const isHidden = box.style.display === 'none' || box.style.display === '';
-      box.style.display = isHidden ? 'block' : 'none';
-      link.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-      box.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
-      if (isHidden) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const isOpen = box.classList.toggle('open');
+      link.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      box.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      if (isOpen) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   })();
 </script>
